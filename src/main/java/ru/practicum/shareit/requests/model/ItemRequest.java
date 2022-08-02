@@ -1,10 +1,12 @@
-package ru.practicum.shareit.requests.dto;
+package ru.practicum.shareit.requests.model;
 
+import lombok.Data;
 import ru.practicum.shareit.user.User;
 
 import java.time.Instant;
 
-public class ItemRequestDto {
+@Data
+public class ItemRequest {
     private Long id;
     private String description;
     private User requestor;
