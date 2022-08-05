@@ -39,7 +39,8 @@ public class ItemRepositoryImpl implements ItemRepository {
 
     @Override
     public Boolean delete(Long id) {
-        return null;
+        items.remove(id);
+        return true;
     }
 
     @Override

@@ -10,6 +10,8 @@ import java.util.Collection;
 @RequestMapping("/items")
 @Slf4j
 public class ItemController {
+    public static final String HTTP_USER_ID_HEADER = "X-Sharer-User-Id";
+
     private final ItemService itemService;
 
     @Autowired
@@ -19,7 +21,7 @@ public class ItemController {
 
     @GetMapping
     public Collection<ItemDto> findAllByUser(
-            @RequestHeader("X-Sharer-User-Id") Long userId
+            @RequestHeader(HTTP_USER_ID_HEADER) Long userId
     ) {
         log.info("Find all items");
         return itemService.findAllByUser(userId);
@@ -27,7 +29,7 @@ public class ItemController {
 
     @GetMapping("/{id}")
     public ItemDto findOneByUser(
-            @RequestHeader("X-Sharer-User-Id") Long userId,
+            @RequestHeader(HTTP_USER_ID_HEADER) Long userId,
             @PathVariable("id") Long itemId
     ) {
         log.info("Find item {}", itemId);
@@ -36,7 +38,7 @@ public class ItemController {
 
     @PostMapping
     public ItemDto create(
-            @RequestHeader("X-Sharer-User-Id") Long userId,
+            @RequestHeader(HTTP_USER_ID_HEADER) Long userId,
             @RequestBody ItemDto itemDto
     ) {
         log.info("Create item {} for user {}", itemDto.toString(), userId);
@@ -45,7 +47,7 @@ public class ItemController {
 
     @PatchMapping("/{id}")
     public ItemDto update(
-            @RequestHeader("X-Sharer-User-Id") Long userId,
+            @RequestHeader(HTTP_USER_ID_HEADER) Long userId,
             @PathVariable("id") Long itemId,
             @RequestBody ItemDto itemDto
     ) {
@@ -54,14 +56,16 @@ public class ItemController {
     }
 
     @DeleteMapping("/{id}")
-    public void delete(@PathVariable("id") Long itemId) {
+    public void delete(
+            @RequestHeader(HTTP_USER_ID_HEADER) Long userId,
+            @PathVariable("id") Long itemId) {
         log.info("Delete item {}", itemId);
-        itemService.delete(itemId);
+        itemService.delete(userId, itemId);
     }
 
     @GetMapping("/search")
     public Collection<ItemDto> search(
-            @RequestHeader("X-Sharer-User-Id") Long userId,
+            @RequestHeader(HTTP_USER_ID_HEADER) Long userId,
             @RequestParam("text") String text) {
         log.info("Search items by '{}'", text);
         return itemService.search(userId, text);

@@ -13,6 +13,7 @@ import java.util.regex.Pattern;
 @Service
 public class UserServiceImpl implements UserService {
     private final UserRepository userRepository;
+    public static final Pattern pattern = Pattern.compile("^(.+)@([^@]+[^.])$");
 
     @Autowired
     public UserServiceImpl(UserRepository userRepository) {
@@ -67,8 +68,7 @@ public class UserServiceImpl implements UserService {
         if(email == null || email.isEmpty() || email.isBlank()) {
             throw new BadRequestException("Поле Email не может быть пустым");
         }
-        Pattern pattern = Pattern.compile("^(.+)@([^@]+[^.])$");
-        Matcher matcher = pattern.matcher(email);
+        Matcher matcher = UserServiceImpl.pattern.matcher(email);
         if (!matcher.find()) {
             throw new BadRequestException("Не верный формат email");
         }

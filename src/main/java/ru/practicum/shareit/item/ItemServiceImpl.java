@@ -29,9 +29,6 @@ public class ItemServiceImpl implements ItemService {
     @Override
     public ItemDto findOneByUser(Long userId, Long id) {
         Item item = findItem(id);
-        /*if (!item.getOwner().equals(findUser(userId))) {
-            throw new NotFoundException("У пользователя нет такой вещи");
-        }*/
         return ItemMapper.toItemDto(item);
     }
 
@@ -63,8 +60,10 @@ public class ItemServiceImpl implements ItemService {
     }
 
     @Override
-    public Boolean delete(Long id) {
-        return null;
+    public Boolean delete(Long userId, Long id) {
+        findUser(id);
+        findItem(id);
+        return itemRepository.delete(id);
     }
 
     @Override
