@@ -4,8 +4,7 @@ import org.springframework.stereotype.Component;
 
 import java.util.*;
 
-@Component
-public class UserRepositoryImpl implements UserRepository {
+public class UserRepositoryImpl implements UserRepository_ {
     private final Map<Long, User> users = new HashMap<>();
     private Long id = Long.valueOf(1);
 

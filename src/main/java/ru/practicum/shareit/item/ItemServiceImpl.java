@@ -7,6 +7,7 @@ import ru.practicum.shareit.exception.NotFoundException;
 import ru.practicum.shareit.user.User;
 import ru.practicum.shareit.user.UserRepository;
 
+import java.util.ArrayList;
 import java.util.Collection;
 
 @Service
@@ -22,12 +23,13 @@ public class ItemServiceImpl implements ItemService {
 
     @Override
     public Collection<ItemDto> findAllByUser(Long userId) {
-        Collection<Item> items = itemRepository.findAllByUser(findUser(userId));
+        Collection<Item> items = itemRepository.findAllByOwnerId(userId);
         return ItemMapper.toItemDto(items);
     }
 
     @Override
     public ItemDto findOneByUser(Long userId, Long id) {
+        findUser(id);
         Item item = findItem(id);
         return ItemMapper.toItemDto(item);
     }
@@ -36,7 +38,7 @@ public class ItemServiceImpl implements ItemService {
     public ItemDto add(Long userId, ItemDto itemDto) {
         validationItem(itemDto);
         itemDto.setOwner(findUser(userId));
-        Item item = itemRepository.add(ItemMapper.toItem(itemDto));
+        Item item = itemRepository.save(ItemMapper.toItem(itemDto));
         return ItemMapper.toItemDto(item);
     }
 
@@ -55,7 +57,7 @@ public class ItemServiceImpl implements ItemService {
         if (itemDto.getAvailable() != null) {
             item.setAvailable(itemDto.getAvailable());
         }
-        Item updatedItem = itemRepository.update(id, item);
+        Item updatedItem = itemRepository.save(item);
         return ItemMapper.toItemDto(updatedItem);
     }
 
@@ -63,23 +65,25 @@ public class ItemServiceImpl implements ItemService {
     public Boolean delete(Long userId, Long id) {
         findUser(id);
         findItem(id);
-        return itemRepository.delete(id);
+        itemRepository.deleteById(id);
+        return true;
     }
 
     @Override
     public Collection<ItemDto> search(Long userId, String text) {
-        User user = findUser(userId);
-        Collection<Item> items = itemRepository.search(text);
-        return ItemMapper.toItemDto(items);
+        //User user = findUser(userId);
+        //Collection<Item> items = itemRepository.search(text);
+        //return ItemMapper.toItemDto(items);
+        return new ArrayList<>();
     }
 
     private Item findItem(Long id) {
-        return itemRepository.findOne(id).orElseThrow(
+        return itemRepository.findById(id).orElseThrow(
                 () -> new NotFoundException(String.format("Вещь %d не найден", id)));
     }
 
     private User findUser(Long id) {
-        return userRepository.findOne(id).orElseThrow(
+        return userRepository.findById(id).orElseThrow(
                 () -> new NotFoundException(String.format("Пользователь %d не найден", id)));
     }
 
