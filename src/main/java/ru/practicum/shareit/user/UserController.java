@@ -10,6 +10,8 @@ import java.util.Collection;
 @RequestMapping(path = "/users")
 @Slf4j
 public class UserController {
+    public static final String HTTP_USER_ID_HEADER = "X-Sharer-User-Id";
+
     private final UserService userService;
 
     @Autowired

@@ -2,11 +2,16 @@ package ru.practicum.shareit.item;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import ru.practicum.shareit.booking.Booking;
+import ru.practicum.shareit.booking.BookingItemDto;
+import ru.practicum.shareit.booking.BookingMapper;
+import ru.practicum.shareit.booking.BookingRepository;
 import ru.practicum.shareit.exception.BadRequestException;
 import ru.practicum.shareit.exception.NotFoundException;
 import ru.practicum.shareit.user.User;
 import ru.practicum.shareit.user.UserRepository;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Collection;
 
@@ -14,32 +19,84 @@ import java.util.Collection;
 public class ItemServiceImpl implements ItemService {
     private final UserRepository userRepository;
     private final ItemRepository itemRepository;
+    private final CommentRepository commentRepository;
+    private final BookingRepository bookingRepository;
 
     @Autowired
-    public ItemServiceImpl(UserRepository userRepository, ItemRepository itemRepository) {
+    public ItemServiceImpl(
+            UserRepository userRepository,
+            ItemRepository itemRepository,
+            CommentRepository commentRepository,
+            BookingRepository bookingRepository) {
         this.userRepository = userRepository;
         this.itemRepository = itemRepository;
+        this.commentRepository = commentRepository;
+        this.bookingRepository = bookingRepository;
     }
 
     @Override
-    public Collection<ItemDto> findAllByUser(Long userId) {
-        Collection<Item> items = itemRepository.findAllByOwnerId(userId);
-        return ItemMapper.toItemDto(items);
+    public Collection<ItemWithBookingDto> findAllByUser(Long userId) {
+        Collection<Item> items = itemRepository.findAllByOwnerIdOrderById(userId);
+        Collection<ItemWithBookingDto> itemsDto = new ArrayList<>();
+        for (Item item: items) {
+            itemsDto.add(getItemWithBookingDto(userId, item));
+        }
+        return itemsDto;
     }
 
     @Override
-    public ItemDto findOneByUser(Long userId, Long id) {
-        findUser(id);
-        Item item = findItem(id);
-        return ItemMapper.toItemDto(item);
+    public ItemWithBookingDto findOneByUser(Long userId, Long itemId) {
+        findUser(userId);
+        Item item = findItem(itemId);
+        return getItemWithBookingDto(userId, item);
+    }
+
+    // Возвращает ItemWithBookingDto
+    private ItemWithBookingDto getItemWithBookingDto(Long userId, Item item) {
+        BookingItemDto lastBookingDto = null;
+        BookingItemDto nextBookingDto = null;
+        if (userId == item.getOwner().getId()) {
+            Booking lastBooking = bookingRepository.
+                    findFirstByItemIdAndEndIsBeforeOrderByStartDesc(item.getId(), LocalDateTime.now()).orElse(null);
+            Booking nextBooking = bookingRepository.
+                    findFirstByItemIdAndStartIsAfterOrderByStart(item.getId(), LocalDateTime.now()).orElse(null);
+            lastBookingDto = lastBooking != null ? BookingMapper.bookingItemDto(lastBooking) : null;
+            nextBookingDto = nextBooking != null ? BookingMapper.bookingItemDto(nextBooking) : null;
+        }
+        return ItemMapper.toItemWithBookingDto(item, lastBookingDto, nextBookingDto);
     }
 
     @Override
     public ItemDto add(Long userId, ItemDto itemDto) {
         validationItem(itemDto);
-        itemDto.setOwner(findUser(userId));
-        Item item = itemRepository.save(ItemMapper.toItem(itemDto));
-        return ItemMapper.toItemDto(item);
+        User user = findUser(userId);
+        Item item = ItemMapper.toItem(itemDto);
+        item.setOwner(user);
+        Item saveItem = itemRepository.save(item);
+        return ItemMapper.toItemDto(saveItem);
+    }
+
+    @Override
+    public CommentDto createComment(Long userId, Long itemId, CommentPostDto commentPostDto) {
+        validationComment(commentPostDto);
+        User user = findUser(userId);
+        Item item = findItem(itemId);
+        if(bookingRepository.countByBookerIdAndItemIdAndStatusAndEndIsBefore(
+                userId,
+                itemId,
+                Booking.BookingStatus.APPROVED,
+                LocalDateTime.now()
+        ) == 0) {
+            throw new BadRequestException(
+                    String.format(
+                            "Пользователь %d не арендовал вещь %d или же не истекло время аренды",
+                            userId,
+                            itemId
+                    ));
+        }
+        Comment comment = CommentMapper.toComment(commentPostDto, user, item);
+        commentRepository.save(comment);
+        return CommentMapper.toCommentDto(comment);
     }
 
     @Override
@@ -71,10 +128,11 @@ public class ItemServiceImpl implements ItemService {
 
     @Override
     public Collection<ItemDto> search(Long userId, String text) {
-        //User user = findUser(userId);
-        //Collection<Item> items = itemRepository.search(text);
-        //return ItemMapper.toItemDto(items);
-        return new ArrayList<>();
+        if (text.isEmpty())
+            return new ArrayList<>();
+        User user = findUser(userId);
+        Collection<Item> items = itemRepository.search(text);
+        return ItemMapper.toItemDto(items);
     }
 
     private Item findItem(Long id) {
@@ -91,7 +149,9 @@ public class ItemServiceImpl implements ItemService {
         if (itemDto.getAvailable() == null) {
             throw new BadRequestException("Поле Available не может быть пустым");
         }
-        if (itemDto.getName() == null || itemDto.getName().isEmpty() || itemDto.getName().isBlank()) {
+        if (itemDto.getName() == null
+                || itemDto.getName().isEmpty()
+                || itemDto.getName().isBlank()) {
             throw new BadRequestException("Поле Name не может быть пустым");
         }
         if (itemDto.getDescription() == null
@@ -99,6 +159,12 @@ public class ItemServiceImpl implements ItemService {
                 || itemDto.getDescription().isBlank()
         ) {
             throw new BadRequestException("Поле Description не может быть пустым");
+        }
+    }
+
+    private void validationComment(CommentPostDto commentDto) {
+        if (commentDto.getText() == null || commentDto.getText().isEmpty() || commentDto.getText().isBlank()) {
+            throw new BadRequestException("Поле Text не может быть пустым");
         }
     }
 }

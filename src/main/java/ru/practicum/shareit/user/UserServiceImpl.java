@@ -76,8 +76,8 @@ public class UserServiceImpl implements UserService {
         if (!matcher.find()) {
             throw new BadRequestException("Не верный формат email");
         }
-        if(userRepository.findFirstByEmailContainingIgnoreCase(email).isPresent()) {
+        /*if(userRepository.findFirstByEmailContainingIgnoreCase(email).isPresent()) {
             throw new ConflictException(String.format("Пользователь %s уже существует", email));
-        }
+        }*/
     }
 }
