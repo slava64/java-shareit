@@ -3,10 +3,10 @@ package ru.practicum.shareit.user;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import ru.practicum.shareit.exception.BadRequestException;
-import ru.practicum.shareit.exception.ConflictException;
 import ru.practicum.shareit.exception.NotFoundException;
 
 import java.util.Collection;
+import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -22,7 +22,8 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public Collection<UserDto> findAll() {
-        return UserMapper.toUserDto(userRepository.findAll().values());
+        List<User> users = userRepository.findAll();
+        return UserMapper.toUserDto(users);
     }
 
     @Override
@@ -33,7 +34,7 @@ public class UserServiceImpl implements UserService {
     @Override
     public UserDto add(UserDto userDto) {
         validateEmail(userDto.getEmail());
-        User addUser = userRepository.add(UserMapper.toUser(userDto));
+        User addUser = userRepository.save(UserMapper.toUser(userDto));
         return UserMapper.toUserDto(addUser);
     }
 
@@ -49,19 +50,21 @@ public class UserServiceImpl implements UserService {
         if (userDto.getEmail() != null) {
             user.setEmail(userDto.getEmail());
         }
-        User updatedUser = userRepository.update(id, user);
+        User updatedUser = userRepository.save(user);
         return UserMapper.toUserDto(updatedUser);
     }
 
     @Override
     public Boolean delete(Long id) {
         findUser(id);
-        return userRepository.delete(id);
+        userRepository.deleteById(id);
+        return true;
     }
 
     private User findUser(Long id) {
-        return userRepository.findOne(id).orElseThrow(
-                () -> new NotFoundException(String.format("Пользователь %d не найден", id)));
+        return userRepository.findById(id).orElseThrow(
+                () -> new NotFoundException(String.format("Пользователь %d не найден", id))
+        );
     }
 
     private void validateEmail(String email) {
@@ -71,9 +74,6 @@ public class UserServiceImpl implements UserService {
         Matcher matcher = UserServiceImpl.pattern.matcher(email);
         if (!matcher.find()) {
             throw new BadRequestException("Не верный формат email");
-        }
-        if(userRepository.isExistByEmail(email)) {
-            throw new ConflictException(String.format("Пользователь %s уже существует", email));
         }
     }
 }
