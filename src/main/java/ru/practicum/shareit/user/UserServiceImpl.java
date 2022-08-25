@@ -3,7 +3,6 @@ package ru.practicum.shareit.user;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import ru.practicum.shareit.exception.BadRequestException;
-import ru.practicum.shareit.exception.ConflictException;
 import ru.practicum.shareit.exception.NotFoundException;
 
 import java.util.Collection;
@@ -76,8 +75,5 @@ public class UserServiceImpl implements UserService {
         if (!matcher.find()) {
             throw new BadRequestException("Не верный формат email");
         }
-        /*if(userRepository.findFirstByEmailContainingIgnoreCase(email).isPresent()) {
-            throw new ConflictException(String.format("Пользователь %s уже существует", email));
-        }*/
     }
 }

@@ -2,10 +2,7 @@ package ru.practicum.shareit.item;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import ru.practicum.shareit.booking.Booking;
-import ru.practicum.shareit.booking.BookingItemDto;
-import ru.practicum.shareit.booking.BookingMapper;
-import ru.practicum.shareit.booking.BookingRepository;
+import ru.practicum.shareit.booking.*;
 import ru.practicum.shareit.exception.BadRequestException;
 import ru.practicum.shareit.exception.NotFoundException;
 import ru.practicum.shareit.user.User;
@@ -84,7 +81,7 @@ public class ItemServiceImpl implements ItemService {
         if(bookingRepository.countByBookerIdAndItemIdAndStatusAndEndIsBefore(
                 userId,
                 itemId,
-                Booking.BookingStatus.APPROVED,
+                BookingStatus.APPROVED,
                 LocalDateTime.now()
         ) == 0) {
             throw new BadRequestException(

@@ -17,5 +17,5 @@ public class BookingDto {
     private LocalDateTime end;
     private ItemDto item;
     private UserDto booker;
-    private Booking.BookingStatus status;
+    private BookingStatus status;
 }

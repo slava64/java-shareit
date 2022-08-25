@@ -7,16 +7,12 @@ import ru.practicum.shareit.item.Item;
 import ru.practicum.shareit.user.User;
 
 import javax.persistence.*;
-import java.time.Instant;
 import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "bookings", schema = "public")
 @Getter @Setter @ToString
 public class Booking {
-    public enum BookingStatus {
-        WAITING, APPROVED, REJECTED, CANCELED;
-    }
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;

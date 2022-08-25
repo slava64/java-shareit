@@ -44,7 +44,7 @@ public final class BookingMapper {
         booking.setEnd(bookingPostDto.getEnd());
         booking.setItem(item);
         booking.setBooker(user);
-        booking.setStatus(Booking.BookingStatus.WAITING);
+        booking.setStatus(BookingStatus.WAITING);
         return booking;
     }
 }

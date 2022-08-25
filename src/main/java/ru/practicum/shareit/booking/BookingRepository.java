@@ -18,7 +18,7 @@ public interface BookingRepository extends JpaRepository<Booking, Long> {
     // FUTURE
     List<Booking> findByBookerIdAndStartIsAfterOrderByStartDesc(Long userId, LocalDateTime start);
     // WAITING AND REJECTED
-    List<Booking> findByBookerIdAndStatusOrderByStartDesc(Long userId, Booking.BookingStatus status);
+    List<Booking> findByBookerIdAndStatusOrderByStartDesc(Long userId, BookingStatus status);
 
     // ALL FOR OWNER
     @Query(value =  " SELECT b.* FROM bookings AS b " +
@@ -68,7 +68,7 @@ public interface BookingRepository extends JpaRepository<Booking, Long> {
     Long countByBookerIdAndItemIdAndStatusAndEndIsBefore(
             Long userId,
             Long itemId,
-            Booking.BookingStatus status,
+            BookingStatus status,
             LocalDateTime end
     );
 }

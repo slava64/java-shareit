@@ -48,11 +48,11 @@ public class BookingServiceImpl implements BookingService {
                 break;
             case WAITING:
                 bookings = bookingRepository.findByBookerIdAndStatusOrderByStartDesc(
-                        userId, Booking.BookingStatus.WAITING);
+                        userId, BookingStatus.WAITING);
                 break;
             case REJECTED:
                 bookings = bookingRepository.findByBookerIdAndStatusOrderByStartDesc(
-                        userId, Booking.BookingStatus.REJECTED);
+                        userId, BookingStatus.REJECTED);
                 break;
             case ALL:
             default:
@@ -78,10 +78,10 @@ public class BookingServiceImpl implements BookingService {
                 bookings = bookingRepository.findAllByOwnerInFuture(userId);
                 break;
             case WAITING:
-                bookings = bookingRepository.findAllByOwnerByStatus(userId, Booking.BookingStatus.WAITING.toString());
+                bookings = bookingRepository.findAllByOwnerByStatus(userId, BookingStatus.WAITING.toString());
                 break;
             case REJECTED:
-                bookings = bookingRepository.findAllByOwnerByStatus(userId, Booking.BookingStatus.REJECTED.toString());
+                bookings = bookingRepository.findAllByOwnerByStatus(userId, BookingStatus.REJECTED.toString());
                 break;
             case ALL:
             default:
@@ -121,21 +121,16 @@ public class BookingServiceImpl implements BookingService {
                     String.format("Пользователь %d не является владельцем вещи %d", userId, bookingId)
             );
         }
-        if (booking.getStatus().equals(Booking.BookingStatus.APPROVED) ||
-                booking.getStatus().equals(Booking.BookingStatus.REJECTED)) {
+        if (booking.getStatus().equals(BookingStatus.APPROVED) ||
+                booking.getStatus().equals(BookingStatus.REJECTED)) {
             throw new BadRequestException(String.format("Вещь %d уже проверена", bookingId));
         }
         if (isApproved) {
-            booking.setStatus(Booking.BookingStatus.APPROVED);
+            booking.setStatus(BookingStatus.APPROVED);
         } else {
-            booking.setStatus(Booking.BookingStatus.REJECTED);
+            booking.setStatus(BookingStatus.REJECTED);
         }
         return BookingMapper.toBookingDto(bookingRepository.save(booking));
-    }
-
-    @Override
-    public Boolean delete(Long id) {
-        return null;
     }
 
     private User findUser(Long id) {
