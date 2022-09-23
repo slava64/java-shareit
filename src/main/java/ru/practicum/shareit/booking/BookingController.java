@@ -21,19 +21,23 @@ public class BookingController {
     @GetMapping
     public Collection<BookingDto> findAll(
             @RequestHeader(UserController.HTTP_USER_ID_HEADER) Long userId,
-            @RequestParam(value = "state", required = false, defaultValue = "ALL") BookingParamState state
+            @RequestParam(value = "state", required = false, defaultValue = "ALL") BookingParamState state,
+            @RequestParam(value = "from", defaultValue = "0") Integer from,
+            @RequestParam(value = "size", defaultValue = "20") Integer size
     ) {
         log.info("Find all bookings for user {}", userId);
-        return bookingService.findAll(userId, state);
+        return bookingService.findAll(userId, state, from, size);
     }
 
     @GetMapping ("/owner")
     public Collection<BookingDto> findAllByOwner(
             @RequestHeader(UserController.HTTP_USER_ID_HEADER) Long userId,
-            @RequestParam(value = "state", required = false, defaultValue = "ALL") BookingParamState state
+            @RequestParam(value = "state", required = false, defaultValue = "ALL") BookingParamState state,
+            @RequestParam(value = "from", defaultValue = "0") Integer from,
+            @RequestParam(value = "size", defaultValue = "20") Integer size
     ) {
         log.info("Find all bookings for owner {}", userId);
-        return bookingService.findAllByOwner(userId, state);
+        return bookingService.findAllByOwner(userId, state, from, size);
     }
 
     @GetMapping("/{id}")

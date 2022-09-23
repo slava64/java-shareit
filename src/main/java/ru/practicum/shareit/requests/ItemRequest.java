@@ -1,4 +1,4 @@
-package ru.practicum.shareit.requests.model;
+package ru.practicum.shareit.requests;
 
 import lombok.Getter;
 import lombok.Setter;
@@ -7,9 +7,8 @@ import ru.practicum.shareit.item.Item;
 import ru.practicum.shareit.user.User;
 
 import javax.persistence.*;
-import java.time.Instant;
-import java.util.Set;
-
+import java.time.LocalDateTime;
+import java.util.Collection;
 
 @Entity
 @Table(name = "requests", schema = "public")
@@ -24,9 +23,9 @@ public class ItemRequest {
     @JoinColumn(name = "requestor_id")
     private User requestor;
     @Column(name = "created", nullable = false)
-    private Instant created = Instant.now();
+    private LocalDateTime created = LocalDateTime.now();
     @OneToMany(mappedBy = "request")
-    private Set<Item> items;
+    private Collection<Item> items;
 
     @Override
     public boolean equals(Object o) {

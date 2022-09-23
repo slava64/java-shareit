@@ -1,5 +1,7 @@
 package ru.practicum.shareit.booking;
 
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import ru.practicum.shareit.exception.BadRequestException;
 import ru.practicum.shareit.exception.NotFoundException;
@@ -29,8 +31,15 @@ public class BookingServiceImpl implements BookingService {
     }
 
     @Override
-    public Collection<BookingDto> findAll(Long userId, BookingParamState state) {
+    public Collection<BookingDto> findAll(Long userId, BookingParamState state, Integer from, Integer size) {
         findUser(userId);
+        if (from < 0) {
+            throw new BadRequestException("Параметр from не должен быть отрицательным");
+        }
+        if (size <= 0) {
+            throw new BadRequestException("Параметр size должен быть больше нуля");
+        }
+
         List<Booking> bookings;
         switch (state)
         {
@@ -56,15 +65,23 @@ public class BookingServiceImpl implements BookingService {
                 break;
             case ALL:
             default:
-                bookings = bookingRepository.findByBookerIdOrderByStartDesc(userId);
+                Pageable pageable = PageRequest.of((int) from / size, size);
+                bookings = bookingRepository.findByBookerIdOrderByStartDesc(userId, pageable);
                 break;
         }
         return BookingMapper.toBookingDto(bookings);
     }
 
     @Override
-    public Collection<BookingDto> findAllByOwner(Long userId, BookingParamState state) {
+    public Collection<BookingDto> findAllByOwner(Long userId, BookingParamState state, Integer from, Integer size) {
         findUser(userId);
+        if (from < 0) {
+            throw new BadRequestException("Параметр from не должен быть отрицательным");
+        }
+        if (size <= 0) {
+            throw new BadRequestException("Параметр size должен быть больше нуля");
+        }
+
         List<Booking> bookings;
         switch (state)
         {
@@ -85,7 +102,8 @@ public class BookingServiceImpl implements BookingService {
                 break;
             case ALL:
             default:
-                bookings = bookingRepository.findAllByOwner(userId);
+                Pageable pageable = PageRequest.of((int) from / size, size);
+                bookings = bookingRepository.findAllByOwner(userId, pageable);
                 break;
         }
         return BookingMapper.toBookingDto(bookings);

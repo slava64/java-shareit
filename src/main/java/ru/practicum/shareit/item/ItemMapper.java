@@ -1,6 +1,7 @@
 package ru.practicum.shareit.item;
 
 import ru.practicum.shareit.booking.BookingItemDto;
+import ru.practicum.shareit.requests.ItemRequest;
 import ru.practicum.shareit.user.UserMapper;
 
 import java.util.ArrayList;
@@ -13,8 +14,7 @@ public final class ItemMapper {
                 item.getName(),
                 item.getDescription(),
                 item.getAvailable(),
-                item.getOwner() != null ? UserMapper.toUserDto(item.getOwner()) : null,
-                item.getRequest() != null ? item.getRequest() : null,
+                item.getRequest() != null ? item.getRequest().getId() : null,
                 item.getComments() != null ? CommentMapper.commentDto(item.getComments()) : null
 
         );
@@ -30,12 +30,29 @@ public final class ItemMapper {
                 item.getName(),
                 item.getDescription(),
                 item.getAvailable(),
-                item.getOwner() != null ? item.getOwner() : null,
-                item.getRequest() != null ? item.getRequest() : null,
+                item.getRequest() != null ? item.getRequest().getId() : null,
                 item.getComments() != null ? CommentMapper.commentDto(item.getComments()) : null,
                 lastBooking,
                 nextBooking
         );
+    }
+
+    public static ItemWithItemRequestDto toItemWithItemRequestDto(Item item) {
+        return new ItemWithItemRequestDto(
+                item.getId(),
+                item.getName(),
+                item.getDescription(),
+                item.getAvailable(),
+                item.getRequest() != null ? item.getRequest().getId() : null
+        );
+    }
+
+    public static Collection<ItemWithItemRequestDto> toItemWithItemRequestDto(Collection<Item> items) {
+        Collection<ItemWithItemRequestDto> itemsWithItemRequestDto = new ArrayList<>();
+        for (Item item : items) {
+            itemsWithItemRequestDto.add(toItemWithItemRequestDto(item));
+        }
+        return itemsWithItemRequestDto;
     }
 
     public static Collection<ItemDto> toItemDto(Collection<Item> items) {
@@ -46,11 +63,12 @@ public final class ItemMapper {
         return itemsDto;
     }
 
-    public static Item toItem(ItemDto itemDto) {
+    public static Item toItem(ItemDto itemDto, ItemRequest request) {
         Item item = new Item();
         item.setName(itemDto.getName());
         item.setDescription(itemDto.getDescription());
         item.setAvailable(itemDto.getAvailable());
+        item.setRequest(request);
         return item;
     }
 }
