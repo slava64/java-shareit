@@ -171,6 +171,9 @@ public class BookingServiceImpl implements BookingService {
         if(!item.getAvailable()) {
             throw new BadRequestException(String.format("Вещь %d не доступна", bookingPostDto.getItemId()));
         }
+        if(bookingPostDto.getStart().isAfter(bookingPostDto.getEnd())) {
+            throw new BadRequestException(String.format("Время start %s больше end", bookingPostDto.getStart()));
+        }
         if(bookingPostDto.getStart().isBefore(LocalDateTime.now())) {
             throw new BadRequestException(String.format("Время start %s в прошлом", bookingPostDto.getStart()));
         }
