@@ -1,5 +1,6 @@
 package ru.practicum.shareit.item;
 
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import ru.practicum.shareit.booking.*;
@@ -15,27 +16,18 @@ import java.util.ArrayList;
 import java.util.Collection;
 
 @Service
+@RequiredArgsConstructor
 public class ItemServiceImpl implements ItemService {
-    private final UserRepository userRepository;
-    private final ItemRepository itemRepository;
-    private final CommentRepository commentRepository;
-    private final BookingRepository bookingRepository;
-    private final ItemRequestRepository itemRequestRepository;
-
     @Autowired
-    public ItemServiceImpl(
-            UserRepository userRepository,
-            ItemRepository itemRepository,
-            CommentRepository commentRepository,
-            BookingRepository bookingRepository,
-            ItemRequestRepository itemRequestRepository
-    ) {
-        this.userRepository = userRepository;
-        this.itemRepository = itemRepository;
-        this.commentRepository = commentRepository;
-        this.bookingRepository = bookingRepository;
-        this.itemRequestRepository = itemRequestRepository;
-    }
+    private final UserRepository userRepository;
+    @Autowired
+    private final ItemRepository itemRepository;
+    @Autowired
+    private final CommentRepository commentRepository;
+    @Autowired
+    private final BookingRepository bookingRepository;
+    @Autowired
+    private final ItemRequestRepository itemRequestRepository;
 
     @Override
     public Collection<ItemWithBookingDto> findAllByUser(Long userId) {

@@ -1,5 +1,6 @@
 package ru.practicum.shareit.item;
 
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
@@ -10,13 +11,10 @@ import java.util.Collection;
 @RestController
 @RequestMapping("/items")
 @Slf4j
+@RequiredArgsConstructor
 public class ItemController {
-    private final ItemService itemService;
-
     @Autowired
-    public ItemController(ItemService itemService) {
-        this.itemService = itemService;
-    }
+    private final ItemService itemService;
 
     @GetMapping
     public Collection<ItemWithBookingDto> findAllByUser(

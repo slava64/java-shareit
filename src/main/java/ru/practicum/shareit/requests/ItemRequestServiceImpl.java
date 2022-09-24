@@ -1,5 +1,7 @@
 package ru.practicum.shareit.requests;
 
+import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
@@ -12,14 +14,12 @@ import ru.practicum.shareit.user.UserRepository;
 import java.util.Collection;
 
 @Service
+@RequiredArgsConstructor
 public class ItemRequestServiceImpl implements ItemRequestService {
+    @Autowired
     private final UserRepository userRepository;
+    @Autowired
     private final ItemRequestRepository itemRequestRepository;
-
-    public ItemRequestServiceImpl(UserRepository userRepository, ItemRequestRepository itemRequestRepository) {
-        this.userRepository = userRepository;
-        this.itemRequestRepository = itemRequestRepository;
-    }
 
     @Override
     public Collection<ItemRequestDto> findAllByUser(Long userId) {

@@ -1,5 +1,7 @@
 package ru.practicum.shareit.booking;
 
+import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -15,20 +17,14 @@ import java.util.Collection;
 import java.util.List;
 
 @Service
+@RequiredArgsConstructor
 public class BookingServiceImpl implements BookingService {
+    @Autowired
     private final BookingRepository bookingRepository;
+    @Autowired
     private final UserRepository userRepository;
+    @Autowired
     private final ItemRepository itemRepository;
-
-    public BookingServiceImpl(
-            BookingRepository bookingRepository,
-            UserRepository userRepository,
-            ItemRepository itemRepository
-    ) {
-        this.bookingRepository = bookingRepository;
-        this.userRepository = userRepository;
-        this.itemRepository = itemRepository;
-    }
 
     @Override
     public Collection<BookingDto> findAll(Long userId, BookingParamState state, Integer from, Integer size) {
