@@ -1,5 +1,9 @@
 package ru.practicum.shareit.booking;
 
+import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import ru.practicum.shareit.exception.BadRequestException;
 import ru.practicum.shareit.exception.NotFoundException;
@@ -13,24 +17,25 @@ import java.util.Collection;
 import java.util.List;
 
 @Service
+@RequiredArgsConstructor
 public class BookingServiceImpl implements BookingService {
+    @Autowired
     private final BookingRepository bookingRepository;
+    @Autowired
     private final UserRepository userRepository;
+    @Autowired
     private final ItemRepository itemRepository;
 
-    public BookingServiceImpl(
-            BookingRepository bookingRepository,
-            UserRepository userRepository,
-            ItemRepository itemRepository
-    ) {
-        this.bookingRepository = bookingRepository;
-        this.userRepository = userRepository;
-        this.itemRepository = itemRepository;
-    }
-
     @Override
-    public Collection<BookingDto> findAll(Long userId, BookingParamState state) {
+    public Collection<BookingDto> findAll(Long userId, BookingParamState state, Integer from, Integer size) {
         findUser(userId);
+        if (from < 0) {
+            throw new BadRequestException("Параметр from не должен быть отрицательным");
+        }
+        if (size <= 0) {
+            throw new BadRequestException("Параметр size должен быть больше нуля");
+        }
+
         List<Booking> bookings;
         switch (state)
         {
@@ -56,15 +61,23 @@ public class BookingServiceImpl implements BookingService {
                 break;
             case ALL:
             default:
-                bookings = bookingRepository.findByBookerIdOrderByStartDesc(userId);
+                Pageable pageable = PageRequest.of((int) from / size, size);
+                bookings = bookingRepository.findByBookerIdOrderByStartDesc(userId, pageable);
                 break;
         }
         return BookingMapper.toBookingDto(bookings);
     }
 
     @Override
-    public Collection<BookingDto> findAllByOwner(Long userId, BookingParamState state) {
+    public Collection<BookingDto> findAllByOwner(Long userId, BookingParamState state, Integer from, Integer size) {
         findUser(userId);
+        if (from < 0) {
+            throw new BadRequestException("Параметр from не должен быть отрицательным");
+        }
+        if (size <= 0) {
+            throw new BadRequestException("Параметр size должен быть больше нуля");
+        }
+
         List<Booking> bookings;
         switch (state)
         {
@@ -85,7 +98,8 @@ public class BookingServiceImpl implements BookingService {
                 break;
             case ALL:
             default:
-                bookings = bookingRepository.findAllByOwner(userId);
+                Pageable pageable = PageRequest.of((int) from / size, size);
+                bookings = bookingRepository.findAllByOwner(userId, pageable);
                 break;
         }
         return BookingMapper.toBookingDto(bookings);
@@ -152,6 +166,9 @@ public class BookingServiceImpl implements BookingService {
         Item item = findItem(bookingPostDto.getItemId());
         if(!item.getAvailable()) {
             throw new BadRequestException(String.format("Вещь %d не доступна", bookingPostDto.getItemId()));
+        }
+        if(bookingPostDto.getStart().isAfter(bookingPostDto.getEnd())) {
+            throw new BadRequestException(String.format("Время start %s больше end", bookingPostDto.getStart()));
         }
         if(bookingPostDto.getStart().isBefore(LocalDateTime.now())) {
             throw new BadRequestException(String.format("Время start %s в прошлом", bookingPostDto.getStart()));

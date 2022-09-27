@@ -1,10 +1,13 @@
 package ru.practicum.shareit.item;
 
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import ru.practicum.shareit.booking.*;
 import ru.practicum.shareit.exception.BadRequestException;
 import ru.practicum.shareit.exception.NotFoundException;
+import ru.practicum.shareit.requests.ItemRequest;
+import ru.practicum.shareit.requests.ItemRequestRepository;
 import ru.practicum.shareit.user.User;
 import ru.practicum.shareit.user.UserRepository;
 
@@ -13,23 +16,18 @@ import java.util.ArrayList;
 import java.util.Collection;
 
 @Service
+@RequiredArgsConstructor
 public class ItemServiceImpl implements ItemService {
-    private final UserRepository userRepository;
-    private final ItemRepository itemRepository;
-    private final CommentRepository commentRepository;
-    private final BookingRepository bookingRepository;
-
     @Autowired
-    public ItemServiceImpl(
-            UserRepository userRepository,
-            ItemRepository itemRepository,
-            CommentRepository commentRepository,
-            BookingRepository bookingRepository) {
-        this.userRepository = userRepository;
-        this.itemRepository = itemRepository;
-        this.commentRepository = commentRepository;
-        this.bookingRepository = bookingRepository;
-    }
+    private final UserRepository userRepository;
+    @Autowired
+    private final ItemRepository itemRepository;
+    @Autowired
+    private final CommentRepository commentRepository;
+    @Autowired
+    private final BookingRepository bookingRepository;
+    @Autowired
+    private final ItemRequestRepository itemRequestRepository;
 
     @Override
     public Collection<ItemWithBookingDto> findAllByUser(Long userId) {
@@ -67,7 +65,11 @@ public class ItemServiceImpl implements ItemService {
     public ItemDto add(Long userId, ItemDto itemDto) {
         validationItem(itemDto);
         User user = findUser(userId);
-        Item item = ItemMapper.toItem(itemDto);
+        ItemRequest itemRequest = null;
+        if (itemDto.getRequestId() != null) {
+            itemRequest = findItemRequest(itemDto.getRequestId());
+        }
+        Item item = ItemMapper.toItem(itemDto, itemRequest);
         item.setOwner(user);
         Item saveItem = itemRepository.save(item);
         return ItemMapper.toItemDto(saveItem);
@@ -92,8 +94,8 @@ public class ItemServiceImpl implements ItemService {
                     ));
         }
         Comment comment = CommentMapper.toComment(commentPostDto, user, item);
-        commentRepository.save(comment);
-        return CommentMapper.toCommentDto(comment);
+        Comment commentSaved = commentRepository.save(comment);
+        return CommentMapper.toCommentDto(commentSaved);
     }
 
     @Override
@@ -110,6 +112,9 @@ public class ItemServiceImpl implements ItemService {
         }
         if (itemDto.getAvailable() != null) {
             item.setAvailable(itemDto.getAvailable());
+        }
+        if (itemDto.getRequestId() != null) {
+            item.setRequest(findItemRequest(itemDto.getRequestId()));
         }
         Item updatedItem = itemRepository.save(item);
         return ItemMapper.toItemDto(updatedItem);
@@ -140,6 +145,11 @@ public class ItemServiceImpl implements ItemService {
     private User findUser(Long id) {
         return userRepository.findById(id).orElseThrow(
                 () -> new NotFoundException(String.format("Пользователь %d не найден", id)));
+    }
+
+    private ItemRequest findItemRequest(Long id) {
+        return itemRequestRepository.findById(id).orElseThrow(
+                    () -> new NotFoundException(String.format("Запрос %d не найден", id)));
     }
 
     private void validationItem(ItemDto itemDto) {

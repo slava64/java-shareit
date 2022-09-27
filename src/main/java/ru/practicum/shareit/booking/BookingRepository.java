@@ -1,5 +1,6 @@
 package ru.practicum.shareit.booking;
 
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 
@@ -9,7 +10,7 @@ import java.util.Optional;
 
 public interface BookingRepository extends JpaRepository<Booking, Long> {
     // ALL
-    List<Booking> findByBookerIdOrderByStartDesc(Long userId);
+    List<Booking> findByBookerIdOrderByStartDesc(Long userId, Pageable pageable);
     // PAST
     List<Booking> findByBookerIdAndEndIsBeforeOrderByStartDesc(Long userId, LocalDateTime end);
     // CURRENT
@@ -25,7 +26,7 @@ public interface BookingRepository extends JpaRepository<Booking, Long> {
             "LEFT JOIN items AS i ON i.id = b.item_id " +
             "WHERE i.owner_id = ?1 " +
             "ORDER BY b.start_date DESC", nativeQuery = true)
-    List<Booking> findAllByOwner(Long userId);
+    List<Booking> findAllByOwner(Long userId, Pageable pageable);
 
     // PAST FOR OWNER
     @Query(value =  " SELECT b.* FROM bookings AS b " +

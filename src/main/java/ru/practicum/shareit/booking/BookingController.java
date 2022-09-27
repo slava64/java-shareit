@@ -1,5 +1,6 @@
 package ru.practicum.shareit.booking;
 
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
@@ -10,30 +11,31 @@ import java.util.Collection;
 @RestController
 @RequestMapping(path = "/bookings")
 @Slf4j
+@RequiredArgsConstructor
 public class BookingController {
-    private final BookingService bookingService;
-
     @Autowired
-    public BookingController(BookingService bookingService) {
-        this.bookingService = bookingService;
-    }
+    private final BookingService bookingService;
 
     @GetMapping
     public Collection<BookingDto> findAll(
             @RequestHeader(UserController.HTTP_USER_ID_HEADER) Long userId,
-            @RequestParam(value = "state", required = false, defaultValue = "ALL") BookingParamState state
+            @RequestParam(value = "state", required = false, defaultValue = "ALL") BookingParamState state,
+            @RequestParam(value = "from", defaultValue = "0") Integer from,
+            @RequestParam(value = "size", defaultValue = "20") Integer size
     ) {
         log.info("Find all bookings for user {}", userId);
-        return bookingService.findAll(userId, state);
+        return bookingService.findAll(userId, state, from, size);
     }
 
     @GetMapping ("/owner")
     public Collection<BookingDto> findAllByOwner(
             @RequestHeader(UserController.HTTP_USER_ID_HEADER) Long userId,
-            @RequestParam(value = "state", required = false, defaultValue = "ALL") BookingParamState state
+            @RequestParam(value = "state", required = false, defaultValue = "ALL") BookingParamState state,
+            @RequestParam(value = "from", defaultValue = "0") Integer from,
+            @RequestParam(value = "size", defaultValue = "20") Integer size
     ) {
         log.info("Find all bookings for owner {}", userId);
-        return bookingService.findAllByOwner(userId, state);
+        return bookingService.findAllByOwner(userId, state, from, size);
     }
 
     @GetMapping("/{id}")
