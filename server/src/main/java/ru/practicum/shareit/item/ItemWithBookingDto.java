@@ -18,10 +18,7 @@ public class ItemWithBookingDto implements Serializable {
     private String description;
     private Boolean available;
     private Long requestId;
-    @Transient
     private Collection<CommentDto> comments;
-    @Transient
     private BookingItemDto lastBooking;
-    @Transient
     private BookingItemDto nextBooking;
 }

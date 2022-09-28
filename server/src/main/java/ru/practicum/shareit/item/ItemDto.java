@@ -3,10 +3,9 @@ package ru.practicum.shareit.item;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import org.springframework.data.annotation.Transient;
 
 import java.io.Serializable;
-import java.util.ArrayList;
+import java.util.Collection;
 
 @Data
 @NoArgsConstructor
@@ -17,6 +16,5 @@ public class ItemDto implements Serializable {
     private String description;
     private Boolean available;
     private Long requestId;
-    @Transient
-    private ArrayList<CommentDto> comments;
+    private Collection<CommentDto> comments;
 }
