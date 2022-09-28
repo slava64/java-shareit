@@ -11,13 +11,17 @@ import java.util.Optional;
 public interface BookingRepository extends JpaRepository<Booking, Long> {
     // ALL
     List<Booking> findByBookerIdOrderByStartDesc(Long userId, Pageable pageable);
+
     // PAST
     List<Booking> findByBookerIdAndEndIsBeforeOrderByStartDesc(Long userId, LocalDateTime end);
+
     // CURRENT
     List<Booking> findByBookerIdAndStartIsBeforeAndEndIsAfterOrderByStartDesc(
             Long userId, LocalDateTime start, LocalDateTime end);
+
     // FUTURE
     List<Booking> findByBookerIdAndStartIsAfterOrderByStartDesc(Long userId, LocalDateTime start);
+
     // WAITING AND REJECTED
     List<Booking> findByBookerIdAndStatusOrderByStartDesc(Long userId, BookingStatus status);
 
@@ -62,6 +66,7 @@ public interface BookingRepository extends JpaRepository<Booking, Long> {
 
     // Find last booking
     Optional<Booking> findFirstByItemIdAndEndIsBeforeOrderByStartDesc(Long itemId, LocalDateTime start);
+
     // Find next booking
     Optional<Booking> findFirstByItemIdAndStartIsAfterOrderByStart(Long itemId, LocalDateTime start);
 

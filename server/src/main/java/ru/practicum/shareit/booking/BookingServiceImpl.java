@@ -30,8 +30,7 @@ public class BookingServiceImpl implements BookingService {
     public Collection<BookingDto> findAll(Long userId, BookingParamState state, Integer from, Integer size) {
         findUser(userId);
         List<Booking> bookings;
-        switch (state)
-        {
+        switch (state) {
             case CURRENT:
                 bookings = bookingRepository.findByBookerIdAndStartIsBeforeAndEndIsAfterOrderByStartDesc(
                         userId, LocalDateTime.now(), LocalDateTime.now());
@@ -65,8 +64,7 @@ public class BookingServiceImpl implements BookingService {
     public Collection<BookingDto> findAllByOwner(Long userId, BookingParamState state, Integer from, Integer size) {
         findUser(userId);
         List<Booking> bookings;
-        switch (state)
-        {
+        switch (state) {
             case CURRENT:
                 bookings = bookingRepository.findAllByOwnerInCurrent(userId);
                 break;
@@ -108,7 +106,7 @@ public class BookingServiceImpl implements BookingService {
         if (item.getOwner().getId() == userId) {
             throw new NotFoundException(String.format("Собственник не может бронировать свою вещь"));
         }
-        if(!item.getAvailable()) {
+        if (!item.getAvailable()) {
             throw new BadRequestException(String.format("Вещь %d не доступна", bookingPostDto.getItemId()));
         }
         Booking booking = bookingRepository.save(BookingMapper.toNewBooking(bookingPostDto, user, item));

@@ -12,7 +12,9 @@ import java.util.Collection;
 
 @Entity
 @Table(name = "requests", schema = "public")
-@Getter @Setter @ToString
+@Getter
+@Setter
+@ToString
 public class ItemRequest {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

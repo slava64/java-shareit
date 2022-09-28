@@ -25,7 +25,7 @@ public final class ItemRequestMapper {
 
     public static Collection<ItemRequestDto> toItemRequestDto(Collection<ItemRequest> itemRequests) {
         Collection<ItemRequestDto> itemRequestDtos = new ArrayList<>();
-        for(ItemRequest itemRequest : itemRequests) {
+        for (ItemRequest itemRequest : itemRequests) {
             itemRequestDtos.add(ItemRequestMapper.toItemRequestDto(itemRequest));
         }
         return itemRequestDtos;

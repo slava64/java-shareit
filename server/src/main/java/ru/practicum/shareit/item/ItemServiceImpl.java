@@ -51,10 +51,14 @@ public class ItemServiceImpl implements ItemService {
         BookingItemDto lastBookingDto = null;
         BookingItemDto nextBookingDto = null;
         if (userId == item.getOwner().getId()) {
-            Booking lastBooking = bookingRepository.
-                    findFirstByItemIdAndEndIsBeforeOrderByStartDesc(item.getId(), LocalDateTime.now()).orElse(null);
-            Booking nextBooking = bookingRepository.
-                    findFirstByItemIdAndStartIsAfterOrderByStart(item.getId(), LocalDateTime.now()).orElse(null);
+            Booking lastBooking = bookingRepository.findFirstByItemIdAndEndIsBeforeOrderByStartDesc(
+                            item.getId(),
+                            LocalDateTime.now()).orElse(null
+                    );
+            Booking nextBooking = bookingRepository.findFirstByItemIdAndStartIsAfterOrderByStart(
+                            item.getId(),
+                            LocalDateTime.now()).orElse(null
+                    );
             lastBookingDto = lastBooking != null ? BookingMapper.bookingItemDto(lastBooking) : null;
             nextBookingDto = nextBooking != null ? BookingMapper.bookingItemDto(nextBooking) : null;
         }
@@ -78,7 +82,7 @@ public class ItemServiceImpl implements ItemService {
     public CommentDto createComment(Long userId, Long itemId, CommentPostDto commentPostDto) {
         User user = findUser(userId);
         Item item = findItem(itemId);
-        if(bookingRepository.countByBookerIdAndItemIdAndStatusAndEndIsBefore(
+        if (bookingRepository.countByBookerIdAndItemIdAndStatusAndEndIsBefore(
                 userId,
                 itemId,
                 BookingStatus.APPROVED,
