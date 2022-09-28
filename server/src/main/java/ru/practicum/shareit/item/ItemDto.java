@@ -6,7 +6,7 @@ import lombok.NoArgsConstructor;
 import org.springframework.data.annotation.Transient;
 
 import java.io.Serializable;
-import java.util.Collection;
+import java.util.List;
 
 @Data
 @NoArgsConstructor
@@ -18,5 +18,5 @@ public class ItemDto implements Serializable {
     private Boolean available;
     private Long requestId;
     @Transient
-    private Collection<CommentDto> comments;
+    private List<CommentDto> comments;
 }
