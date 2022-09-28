@@ -54,7 +54,7 @@ public class UserController {
     }
 
     private void validateEmail(String email) {
-        if(email == null || email.isEmpty() || email.isBlank()) {
+        if (email == null || email.isEmpty() || email.isBlank()) {
             throw new BadRequestException("Поле Email не может быть пустым");
         }
         Matcher matcher = UserController.pattern.matcher(email);

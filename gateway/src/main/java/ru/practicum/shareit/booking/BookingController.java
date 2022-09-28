@@ -2,7 +2,6 @@ package ru.practicum.shareit.booking;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
@@ -10,7 +9,6 @@ import ru.practicum.shareit.exception.BadRequestException;
 import ru.practicum.shareit.user.UserController;
 
 import java.time.LocalDateTime;
-import java.util.Collection;
 
 @Controller
 @RequestMapping(path = "/bookings")
@@ -83,13 +81,13 @@ public class BookingController {
     }
 
     private void validationBooking(BookingPostDto bookingPostDto) {
-        if(bookingPostDto.getStart().isAfter(bookingPostDto.getEnd())) {
+        if (bookingPostDto.getStart().isAfter(bookingPostDto.getEnd())) {
             throw new BadRequestException(String.format("Время start %s больше end", bookingPostDto.getStart()));
         }
-        if(bookingPostDto.getStart().isBefore(LocalDateTime.now())) {
+        if (bookingPostDto.getStart().isBefore(LocalDateTime.now())) {
             throw new BadRequestException(String.format("Время start %s в прошлом", bookingPostDto.getStart()));
         }
-        if(bookingPostDto.getEnd().isBefore(LocalDateTime.now())) {
+        if (bookingPostDto.getEnd().isBefore(LocalDateTime.now())) {
             throw new BadRequestException(String.format("Время end %s в прошлом", bookingPostDto.getEnd()));
         }
     }

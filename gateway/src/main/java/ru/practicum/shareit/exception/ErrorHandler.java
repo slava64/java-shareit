@@ -34,7 +34,7 @@ public class ErrorHandler {
     @ExceptionHandler
     public ResponseEntity<Map<String,String>> handleMethodArgumentTypeMismatchException(
             MethodArgumentTypeMismatchException e
-    ){
+    ) {
         Map<String,String> resp = new HashMap<>();
         resp.put("error",String.format("Unknown %s: %s", e.getName(), e.getValue()));
         return new ResponseEntity<>(resp, HttpStatus.BAD_REQUEST);
