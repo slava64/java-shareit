@@ -94,7 +94,7 @@ public class BookingServiceImpl implements BookingService {
         findUser(userId);
         Booking booking = findBooking(id);
         if (!checkIsBooker(userId, booking) && !checkIsOwner(userId, booking)) {
-            throw new NotFoundException(String.format("Вы не являетесь автором бронирования или владельцем вещи"));
+            throw new NotFoundException("Вы не являетесь автором бронирования или владельцем вещи");
         }
         return BookingMapper.toBookingDto(booking);
     }
@@ -103,8 +103,8 @@ public class BookingServiceImpl implements BookingService {
     public BookingDto create(Long userId, BookingPostDto bookingPostDto) {
         User user = findUser(userId);
         Item item = findItem(bookingPostDto.getItemId());
-        if (item.getOwner().getId() == userId) {
-            throw new NotFoundException(String.format("Собственник не может бронировать свою вещь"));
+        if (item.getOwner().getId().equals(userId)) {
+            throw new NotFoundException("Собственник не может бронировать свою вещь");
         }
         if (!item.getAvailable()) {
             throw new BadRequestException(String.format("Вещь %d не доступна", bookingPostDto.getItemId()));
@@ -148,17 +148,11 @@ public class BookingServiceImpl implements BookingService {
                 () -> new NotFoundException(String.format("Бронирование %d не найдено", id)));
     }
 
-    private boolean checkIsOwner(Long userId, Booking booking) {
-        if (userId == booking.getItem().getOwner().getId()) {
-            return true;
-        }
-        return false;
+    private Boolean checkIsOwner(Long userId, Booking booking) {
+        return userId.equals(booking.getItem().getOwner().getId());
     }
 
-    private boolean checkIsBooker(Long userId, Booking booking) {
-        if (userId == booking.getBooker().getId()) {
-            return true;
-        }
-        return false;
+    private Boolean checkIsBooker(Long userId, Booking booking) {
+        return userId.equals(booking.getBooker().getId());
     }
 }

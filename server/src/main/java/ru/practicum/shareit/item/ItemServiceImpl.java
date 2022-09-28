@@ -50,7 +50,7 @@ public class ItemServiceImpl implements ItemService {
     private ItemWithBookingDto getItemWithBookingDto(Long userId, Item item) {
         BookingItemDto lastBookingDto = null;
         BookingItemDto nextBookingDto = null;
-        if (userId == item.getOwner().getId()) {
+        if (userId.equals(item.getOwner().getId())) {
             Booking lastBooking = bookingRepository.findFirstByItemIdAndEndIsBeforeOrderByStartDesc(
                             item.getId(),
                             LocalDateTime.now()).orElse(null
@@ -134,7 +134,7 @@ public class ItemServiceImpl implements ItemService {
     public Collection<ItemDto> search(Long userId, String text) {
         if (text.isEmpty())
             return new ArrayList<>();
-        User user = findUser(userId);
+        findUser(userId);
         Collection<Item> items = itemRepository.search(text);
         return ItemMapper.toItemDto(items);
     }
