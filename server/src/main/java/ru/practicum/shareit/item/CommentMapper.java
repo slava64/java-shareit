@@ -4,7 +4,6 @@ import ru.practicum.shareit.user.User;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.List;
 
 public class CommentMapper {
     public static CommentDto toCommentDto(Comment comment) {
