@@ -4,6 +4,7 @@ import ru.practicum.shareit.user.User;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.List;
 
 public class CommentMapper {
     public static CommentDto toCommentDto(Comment comment) {
@@ -15,8 +16,8 @@ public class CommentMapper {
         );
     }
 
-    public static Collection<CommentDto> commentDto(Collection<Comment> comments) {
-        Collection<CommentDto> commentsDto = new ArrayList<>();
+    public static List<CommentDto> commentDto(Collection<Comment> comments) {
+        List<CommentDto> commentsDto = new ArrayList<>();
         for (Comment comment: comments
              ) {
             commentsDto.add(toCommentDto(comment));
