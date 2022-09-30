@@ -37,6 +37,7 @@ public class ErrorHandler {
     ) {
         Map<String,String> resp = new HashMap<>();
         resp.put("error",String.format("Unknown %s: %s", e.getName(), e.getValue()));
+        log.warn(resp.toString());
         return new ResponseEntity<>(resp, HttpStatus.BAD_REQUEST);
     }
 
